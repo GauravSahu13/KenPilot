@@ -14,7 +14,7 @@ export async function GET() {
     // Using aggregateRaw for MongoDB via Prisma
     const result = (await prisma.chatMessage.aggregateRaw({
       pipeline,
-    })) as Array<{ _id: string; count: number }>;
+    })) as unknown as Array<{ _id: string; count: number }>;
 
     const mostAsked = result.map((r) => ({
       question: r._id,
