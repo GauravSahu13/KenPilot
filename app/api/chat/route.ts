@@ -23,22 +23,25 @@ export async function POST(request: NextRequest) {
     if (!session && sessionId) {
       session = await prisma.chatSession.create({
         data: { sessionId },
+        include: { messages: { orderBy: { createdAt: "asc" }, take: 20 } },
       });
     } else if (!session) {
       const newSessionId = uuidv4();
       session = await prisma.chatSession.create({
         data: { sessionId: newSessionId },
+        include: { messages: { orderBy: { createdAt: "asc" }, take: 20 } },
       });
     }
 
     // Get chat history (already included if session existed)
     const chatHistory =
-      session?.messages ??
-      (await prisma.chatMessage.findMany({
-        where: { sessionId: session.sessionId },
-        orderBy: { createdAt: "asc" },
-        take: 20,
-      }));
+      session?.messages && Array.isArray(session.messages)
+        ? session.messages
+        : await prisma.chatMessage.findMany({
+            where: { sessionId: session.sessionId },
+            orderBy: { createdAt: "asc" },
+            take: 20,
+          });
 
     // Save user message
     await prisma.chatMessage.create({
