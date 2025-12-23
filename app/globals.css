@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  min-height: 100vh;
+}
+
+.ai-bg {
+  position: relative;
+  background: radial-gradient(80% 60% at 50% 0%, rgba(14, 165, 233, 0.08), transparent),
+    radial-gradient(60% 50% at 20% 20%, rgba(109, 40, 217, 0.08), transparent),
+    radial-gradient(50% 50% at 80% 30%, rgba(16, 185, 129, 0.08), transparent),
+    #eef2f7;
+  overflow: hidden;
+}
+
+.ai-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.35), transparent 60%);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.ai-glow {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  filter: blur(100px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.ai-glow.primary {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25), transparent 55%);
+}
+
+.ai-glow.accent {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25), transparent 55%);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Chatbot specific styles */
+.chat-message {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
