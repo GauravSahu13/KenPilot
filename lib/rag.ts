@@ -4,12 +4,17 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { prisma } from "./prisma";
 
-// Initialize Groq LLM
-const llm = new ChatGroq({
-  model: "llama-3.1-8b-instant",
-  temperature: 0.7,
-  apiKey: process.env.GROQ_API_KEY,
-});
+// Lazy initialization of Groq LLM (only when needed)
+function getLLM() {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY environment variable is not set");
+  }
+  return new ChatGroq({
+    model: "llama-3.1-8b-instant",
+    temperature: 0.7,
+    apiKey: process.env.GROQ_API_KEY,
+  });
+}
 
 // System prompt for the chatbot
 const SYSTEM_PROMPT = `You are an AI assistant for Kenmark ITan Solutions. Your role is to help users with information about the company, services, and FAQs.
@@ -88,16 +93,21 @@ export async function generateResponse(
     }
 
     // Build prompt with context
+    const historyMessages: Array<["human" | "assistant", string]> = chatHistory.map(msg => [
+      msg.role === "user" ? "human" : "assistant",
+      msg.content
+    ] as ["human" | "assistant", string]);
+    
     const prompt = ChatPromptTemplate.fromMessages([
       ["system", SYSTEM_PROMPT + "\n\nContext:\n{context}"],
-      ...chatHistory.map(msg => [msg.role === "user" ? "human" : "assistant", msg.content]),
+      ...historyMessages,
       ["human", "{query}"],
     ]);
 
     // Create chain
     const chain = RunnableSequence.from([
       prompt,
-      llm,
+      getLLM(),
       new StringOutputParser(),
     ]);
 
